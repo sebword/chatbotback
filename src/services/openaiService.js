@@ -1,11 +1,9 @@
 import OpenAI from "openai";
 import dotenv from "dotenv";
+import { generateLeonardoImage } from "./leonardoService.js";
 
 
 dotenv.config();
-
-
-
 
 const client = new OpenAI({
   apiKey: process.env.OPENAI_GROQ,
@@ -20,15 +18,13 @@ export const streamChatResponse = async (messages, generateImage = false) => {
   try {
     // 💬 1️⃣ Obtener respuesta de texto desde Groq
 
-    
-
     const cleanMessages = messages.map(({ role, content }) => ({
       role,
       content,
     }));
     const completion = await client.chat.completions.create({
       model: "llama-3.3-70b-versatile", // Modelo Groq (mejor rendimiento)
-      messages:cleanMessages,
+      messages: cleanMessages,
       temperature: 0.8,
     });
 
@@ -54,11 +50,9 @@ export const streamChatResponse = async (messages, generateImage = false) => {
       throw new Error("No se encontró un mensaje del usuario para generar la imagen.");
     }
 
-    // 🎨 4️⃣ Crear la URL de la imagen desde Pollinations (gratis)
-    const prompt = encodeURIComponent(
-      `Ilustración educativa del tema: ${lastUserMessage.content}`
-    );
-    const imageUrl = `https://image.pollinations.ai/prompt/${prompt}`;
+    const imagePrompt = `Ilustración educativa sobre ${lastUserMessage.content}. Diseño moderno tipo infografía, colores vibrantes, composición limpia, estilo didáctico, alta calidad, muy detallada, iluminación suave, fondo claro, estilo profesional`;
+
+    const imageUrl = await generateLeonardoImage(imagePrompt);
 
     // 🚀 5️⃣ Devolver texto + imagen
     return {

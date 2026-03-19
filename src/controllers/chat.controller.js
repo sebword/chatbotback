@@ -1,4 +1,6 @@
+import { generateLeonardoImage } from "../services/leonardoService.js";
 import { streamChatResponse } from "../services/openaiService.js";
+
 
 export const handleChat = async (req, res) => {
   try {
